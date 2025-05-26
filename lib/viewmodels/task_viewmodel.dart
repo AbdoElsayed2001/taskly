@@ -10,6 +10,28 @@ class TaskViewModel extends ChangeNotifier {
 
   List<Task> get tasks => _tasks;
 
+  TaskFilter _filter = TaskFilter.all;
+
+  TaskFilter get filter => _filter;
+
+  List<Task> get filteredTasks {
+    switch (_filter) {
+      case TaskFilter.completed:
+        return _tasks.where((t) => t.isCompleted).toList();
+      case TaskFilter.incomplete:
+        return _tasks.where((t) => !t.isCompleted).toList();
+      case TaskFilter.all:
+      default:
+        return _tasks;
+    }
+  }
+
+  void setFilter(TaskFilter filter) {
+    _filter = filter;
+    notifyListeners();
+  }
+
+
   Future<void> loadTasks() async {
     _tasks = await _databaseService.getTasks();
     notifyListeners();
@@ -43,4 +65,10 @@ class TaskViewModel extends ChangeNotifier {
     );
     await updateTask(updatedTask);
   }
+}
+
+enum TaskFilter {
+  all,
+  completed,
+  incomplete,
 }
